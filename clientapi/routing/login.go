@@ -8,8 +8,7 @@ package routing
 
 import (
 	"context"
-	"net/http"
-
+	"fmt"
 	"github.com/element-hq/dendrite/clientapi/auth"
 	"github.com/element-hq/dendrite/clientapi/auth/authtypes"
 	"github.com/element-hq/dendrite/clientapi/userutil"
@@ -17,6 +16,7 @@ import (
 	userapi "github.com/element-hq/dendrite/userapi/api"
 	"github.com/matrix-org/gomatrixserverlib/spec"
 	"github.com/matrix-org/util"
+	"net/http"
 )
 
 type loginResponse struct {
@@ -113,4 +113,40 @@ func completeAuth(
 			DeviceID:    performRes.Device.ID,
 		},
 	}
+}
+
+func handleSharedSecretLogin(cfg *config.ClientAPI, userAPI userapi.ClientUserAPI, sl *SharedSecretLogin, req *http.Request) util.JSONResponse {
+	sslr, err := NewSharedSecretLoginRequest(req.Body)
+	if err != nil {
+		return util.JSONResponse{
+			Code: 400,
+			JSON: spec.BadJSON(fmt.Sprintf("malformed json: %s", err)),
+		}
+	}
+	valid, err := sl.IsValidMacLogin(sslr.Nonce, sslr.User, sslr.MacBytes)
+	if err != nil {
+		return util.ErrorResponse(err)
+	}
+	if !valid {
+		return util.JSONResponse{
+			Code: 403,
+			JSON: spec.Forbidden("bad mac"),
+		}
+	}
+
+	login := &auth.Login{
+		LoginIdentifier: auth.LoginIdentifier{
+			Type: "m.id.shared_secret",
+			User: sslr.User,
+		},
+		Identifier: auth.LoginIdentifier{
+			Type: "m.id.shared_secret",
+			User: sslr.User,
+		},
+		InitialDisplayName: nil,
+		DeviceID:           nil,
+	}
+
+	resp := completeAuth(req.Context(), cfg.Matrix, userAPI, login, req.RemoteAddr, req.UserAgent())
+	return resp
 }

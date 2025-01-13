@@ -8,6 +8,7 @@ package routing
 
 import (
 	"context"
+	"github.com/nats-io/nats.go"
 	"net/http"
 	"strings"
 
@@ -15,7 +16,6 @@ import (
 	"github.com/matrix-org/gomatrixserverlib/fclient"
 	"github.com/matrix-org/gomatrixserverlib/spec"
 	"github.com/matrix-org/util"
-	"github.com/nats-io/nats.go"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/singleflight"
@@ -162,6 +162,30 @@ func Setup(
 				}
 				if req.Method == http.MethodPost {
 					return handleSharedSecretRegistration(cfg, userAPI, sr, req)
+				}
+				return util.JSONResponse{
+					Code: http.StatusMethodNotAllowed,
+					JSON: spec.NotFound("unknown method"),
+				}
+			}),
+		).Methods(http.MethodGet, http.MethodPost, http.MethodOptions)
+
+		logrus.Info("Enabling shared secret login at /_synapse/admin/v1/login")
+		sl := NewSharedSecretLogin(cfg.RegistrationSharedSecret)
+		synapseAdminRouter.Handle("/admin/v1/login",
+			httputil.MakeExternalAPI("shared_secret_login", func(req *http.Request) util.JSONResponse {
+				if req.Method == http.MethodGet {
+					return util.JSONResponse{
+						Code: 200,
+						JSON: struct {
+							Nonce string `json:"nonce"`
+						}{
+							Nonce: sl.GenerateNonce(),
+						},
+					}
+				}
+				if req.Method == http.MethodPost {
+					return handleSharedSecretLogin(cfg, userAPI, sl, req)
 				}
 				return util.JSONResponse{
 					Code: http.StatusMethodNotAllowed,
