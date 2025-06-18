@@ -1,5 +1,7 @@
 module github.com/element-hq/dendrite
 
+replace github.com/getsentry/sentry-go => github.com/getsentry/sentry-go v0.33.0
+
 require (
 	github.com/Arceliar/phony v0.0.0-20220903101357-530938a4b13d
 	github.com/DATA-DOG/go-sqlmock v1.5.2

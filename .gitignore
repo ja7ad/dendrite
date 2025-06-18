@@ -53,6 +53,7 @@ _testmain.go
 
 # Default configuration file
 dendrite.yaml
+config.yaml
 
 # Database files
 *.db
