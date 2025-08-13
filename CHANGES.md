@@ -1,5 +1,25 @@
 # Changelog
 
+## Dendrite 0.15.0 (2025-08-12)
+
+### ⚠ Important
+
+This is a security release, adding support for [room version 12](https://matrix.org/blog/2025/08/security-release/).
+
+### Features
+ - Add support for [MSC4163](https://github.com/matrix-org/matrix-spec-proposals/pull/4163).
+ - Add support for [MSC3967](https://github.com/matrix-org/matrix-spec-proposals/pull/3967).
+ - Add support for room version 12.
+
+### Bug fixes
+ - Refactored NATS JetStream code to gracefully handle more potential errors. (contributed by [neilalexander](https://github.com/neilalexander))
+ - Refactored NATS startup and readiness checking. (contributed by [neilalexander](https://github.com/neilalexander))
+ - Updated NATS to 2.11.7. (contributed by [neilalexander](https://github.com/neilalexander))
+ - Fixed an issue which could cause Dendrite to become unresponsive for minutes at a time. (contributed by [viviicat](https://github.com/viviicat))
+ - Order events when backfilling to reduce the amount of unecessary `/state_ids` requests.
+ - Gracefully handle incorrect sync filter JSON.
+ - Fixed an issue which prevented device deletion working correctly. (contributed by [robinsdan](https://github.com/robinsdan))
+
 ## Dendrite 0.14.1 (2025-01-16)
 
 ### ⚠ Important
