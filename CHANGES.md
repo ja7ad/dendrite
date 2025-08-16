@@ -1,5 +1,19 @@
 # Changelog
 
+## Dendrite 0.15.2 (2025-08-15)
+
+### Bug fixes
+ - Fixed an issue which could cause Dendrite to crash on startup if the room state lacked a create event.
+
+## Dendrite 0.15.1 (2025-08-13)
+
+### Bug fixes
+ - Fixed an issue which could cause Dendrite to become unresponsive for minutes at a time. (contributed by [viviicat](https://github.com/viviicat))
+ - Fixed an issue which prevented joining v12 rooms in some circumstances.
+ - Fixed an issue which prevented sending invites to v12 rooms.
+ - Fixed an issue which prevented some clients from syncing v12 rooms.
+ - Fixed an issue where a single badly formed PDU would block entire transactions of PDUs being processed. See https://github.com/element-hq/synapse/issues/7543 for the related issue on Synapse.
+
 ## Dendrite 0.15.0 (2025-08-12)
 
 ### ⚠ Important
